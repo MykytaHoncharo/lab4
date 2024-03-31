@@ -7,5 +7,13 @@
                     <a href="/read" class="btn btn-warning btn-block">Переглянути та редагувати</a>
                 </div>
             </div>
+
+            <h1 class="text-center mb-4">Подання авторів</h1>
+            <div class="d-grid gap-2">
+                <!-- Кнопка для створення нового автора -->
+                <a href="{% url 'create_author' %}" class="btn btn-primary btn-block">Створити Автора</a>
+                <!-- Кнопка для перегляду та редагування списку авторів -->
+                <a href="{% url 'read_authors' %}" class="btn btn-warning btn-block">Переглянути та редагувати Авторів</a>
+            </div>
         </div>
     </div>

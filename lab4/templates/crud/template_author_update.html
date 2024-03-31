@@ -1,0 +1,39 @@
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Редагувати дані про автора</h1>
+    <!-- Форма оновлення автора -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="name" class="form-label">Ім'я</label>
+            <input type="text" name="name" id="name" class="form-control {% if form.errors.name %}is-invalid{% endif %}" value="{{ form.instance.name }}" required>
+            {% if form.errors.name %}
+            <div class="invalid-feedback">
+                {{ form.errors.name.0 }}
+            </div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="surname" class="form-label">Прізвище</label>
+            <input type="text" name="surname" id="surname" class="form-control {% if form.errors.surname %}is-invalid{% endif %}" value="{{ form.instance.surname }}" required>
+            {% if form.errors.surname %}
+            <div class="invalid-feedback">
+                {{ form.errors.surname.0 }}
+            </div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="birth_year" class="form-label">Рік народження</label>
+            <input type="number" name="birth_year" id="birth_year" class="form-control {% if form.errors.birth_year %}is-invalid{% endif %}" value="{{ form.instance.birth_year }}" required>
+            {% if form.errors.birth_year %}
+            <div class="invalid-feedback">
+                {{ form.errors.birth_year.0 }}
+            </div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="bio" class="form-label">Біографія</label>
+            <textarea name="bio" id="bio" class="form-control" rows="4" required>{{ form.instance.bio }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Зберегти</button>
+    </form>
+</div>

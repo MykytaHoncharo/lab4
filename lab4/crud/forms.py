@@ -38,3 +38,21 @@ class BookForm(forms.ModelForm):
                 raise forms.ValidationError(errors['year'])
 
         return year
+
+
+class AuthorForm(forms.ModelForm):
+    class Meta:
+        model = Author
+        fields = ['name', 'surname', 'birth_year', 'bio']
+        labels = {
+            'name': 'Ім\'я',
+            'surname': 'Прізвище',
+            'birth_year': 'Рік народження',
+            'bio': 'Біографія'
+        }
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введіть ім\'я'}),
+            'surname': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введіть прізвище'}),
+            'birth_year': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Введіть рік народження'}),
+            'bio': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Введіть біографію', 'rows': 3}),
+        }

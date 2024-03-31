@@ -1,0 +1,9 @@
+<div class="container mt-5 text-center">
+    <h1 class="text-center mb-4">Видалення автора</h1>
+    <p>Ви дійсно хочете видалити автора <strong>"{{ author.name }} {{ author.surname }}"</strong>?</p>
+    <form action="{% url 'delete_author' author.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Видалити</button>
+        <a href="{% url 'read_authors' %}" class="btn btn-secondary">Скасувати</a>
+    </form>
+</div>
