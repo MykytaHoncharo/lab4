@@ -21,5 +21,10 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('crud.urls'))
+    path('', include('crud.urls')),
+    path('users/', include('users.urls'))
 ] + static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)
+
+admin.site.index_title = 'Моделі проекту'
+admin.site.site_header= "Адміністративна панель"
+admin.site.site_title = "Лабораторна 6"

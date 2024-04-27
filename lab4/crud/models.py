@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
@@ -15,6 +16,7 @@ class Author(models.Model):
     def __str__(self):
         return str(self.name) + " " + str(self.surname)
 
+
     class Meta:
         verbose_name="Автор"
         verbose_name_plural="Автори"
@@ -26,6 +28,10 @@ class Books(models.Model):
 
     def __str__(self):
         return self.title
+
+    def display_author(self):
+        return self.author.__str__()
+    display_author.short_description = "Автор"
 
     class Meta:
         verbose_name="Книга"

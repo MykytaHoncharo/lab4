@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-$fo+cy+jc%t0pmce4=al63y8@_+d@b7j!3ox5#5)@6(p(e&323
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+AUTH_USER_MODEL = 'users.CustomUser'
 
 # Application definition
 
@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crud'
+    'crud',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -119,8 +120,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-
+#STATIC_ROOT = str(BASE_DIR) + "/" + 'static'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+LOGIN_URL = 'login'

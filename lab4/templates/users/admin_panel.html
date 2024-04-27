@@ -1,0 +1,23 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+
+<div class="container">
+        <h1 class="mt-4 mb-4">Користувачі</h1>
+        <div class="row">
+            {% for user in users %}
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ user.username }}</h5>
+                        <p class="card-text">Пошта: {{ user.email }}</p>
+                        <p class="card-text">Роль: {{ user.role }}</p>
+                        <a href="{% url 'change_role' user.id %}"><button onclick= type="submit" class="btn btn-primary">Редагувати користувача</button></a>
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

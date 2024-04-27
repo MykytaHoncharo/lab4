@@ -1,12 +1,18 @@
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.decorators import method_decorator
 from django.views.generic.base import View
 from .forms import BookForm, AuthorForm
 from .models import Books, Author
 
 
+
+@login_required
 def index(request):
     return render(request, 'crud/base.html', {'block_name': 'crud/template_menu.html'})
-
+@login_required
 def read(request):
     books = Books.objects.all()  # Отримуємо всі книги з бази даних
     search_query = request.GET.get('q', '')  # Отримуємо пошуковий запит з GET-параметра 'q'
@@ -21,6 +27,7 @@ def read(request):
     }
     return render(request, 'crud/base.html', context)
 
+@login_required
 def create(request):
     if request.method == 'POST':
         form = BookForm(request.POST)
@@ -45,6 +52,7 @@ def create(request):
 
     return render(request, 'crud/base.html', context)
 
+@login_required
 def delete(request, book_id):
     book = get_object_or_404(Books, pk=book_id)
     if request.method == 'POST':
@@ -59,6 +67,7 @@ def delete(request, book_id):
     return render(request, 'crud/base.html', context)
 
 
+@login_required
 def update(request, book_id):
     book = get_object_or_404(Books, pk=book_id)
 
@@ -85,6 +94,12 @@ def update(request, book_id):
 
 #---------------------------CBV-----------------------------
 
+def class_view_decorator(decorator):
+    def _decorator(cls):
+        cls.dispatch = method_decorator(decorator)(cls.dispatch)
+        return cls
+    return _decorator
+@class_view_decorator(login_required)
 class AuthorListView(View):
     def get(self, request):
         authors = Author.objects.all()
@@ -93,6 +108,7 @@ class AuthorListView(View):
             authors = authors.filter(name__icontains=search_query)
         return render(request, 'crud/base.html', {'authors': authors,"block_name":'crud/template_author_read.html'})
 
+@class_view_decorator(login_required)
 class AuthorCreateView(View):
     def get(self, request):
         form = AuthorForm()
@@ -108,6 +124,7 @@ class AuthorCreateView(View):
         else:
             return render(request, 'crud/base.html', {'form': form, "block_name":'crud/template_author_create.html'})
 
+@class_view_decorator(login_required)
 class AuthorDeleteView(View):
     def get(self, request, author_id):
         author = get_object_or_404(Author, pk=author_id)
@@ -118,6 +135,7 @@ class AuthorDeleteView(View):
         author.delete()
         return redirect('read_authors')
 
+@class_view_decorator(login_required)
 class AuthorUpdateView(View):
     def get(self, request, author_id):
         author = get_object_or_404(Author, pk=author_id)
@@ -133,3 +151,5 @@ class AuthorUpdateView(View):
         else:
             print(form.errors)
             return render(request, 'crud/base.html', {'form': form, 'author': author, "block_name":'crud/template_author_update.html'})
+
+

@@ -1,0 +1,23 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+
+<div class="container">
+<h2>Зміна ролі користувача</h2>
+<h5>{{ user.email }}</h5>
+    <div class="card mb-4">
+    <div class="card-body">
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            <label for="new_role">Нова роль:</label>
+            <select name="new_role" id="new_role">
+                <option value="user">Користувач</option>
+                <option value="manager">Менеджер</option>
+            </select>
+        </div>
+        <button class="btn btn-primary mt-3" type="submit">Зберегти</button>
+    </form>
+    </div></div>
+</div>
+{% endblock %}

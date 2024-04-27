@@ -21,8 +21,13 @@
                 <p class="mb-0">Автор: {{ book.author }} | Рік: {{ book.year }}</p>
             </div>
             <div class="d-flex justify-content-end">
-                <a href="{% url 'update_book' book.id %}" class="btn btn-sm btn-warning me-2">Редагувати</a>
-                <a href="{% url 'delete_book' book.id %}" class="btn btn-sm btn-danger">Видалити</a>
+                        {% if request.user.is_admin %}
+                                <a href="{% url 'update_book' book.id %}" class="btn btn-sm btn-warning me-2">Редагувати</a>
+                                <a href="{% url 'delete_book' book.id %}" class="btn btn-sm btn-danger">Видалити</a>
+                        {% elif request.user.is_manager %}
+                                <a href="{% url 'update_book' book.id %}" class="btn btn-sm btn-warning me-2">Редагувати</a>
+                                <a href="{% url 'delete_book' book.id %}" class="btn btn-sm btn-danger">Видалити</a>
+                        {% endif %}
             </div>
         </li>
         {% endfor %}
