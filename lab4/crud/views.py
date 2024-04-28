@@ -1,6 +1,4 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic.base import View
@@ -29,67 +27,76 @@ def read(request):
 
 @login_required
 def create(request):
-    if request.method == 'POST':
-        form = BookForm(request.POST)
-        if form.is_valid():
-            book = form.save()
-            return redirect('read_books')
+    if request.user.is_admin() or request.user.is_manager():
+        if request.method == 'POST':
+            form = BookForm(request.POST)
+            if form.is_valid():
+                book = form.save()
+                return redirect('read_books')
+            else:
+                print("Помилка")
+                #return redirect('book_list')
         else:
-            print("Помилка")
-            #return redirect('book_list')
+            form = BookForm()
+
+            # Фільтрація авторів за введеним ім'ям
+        author_name = request.GET.get('author_name', '')
+        authors = Author.objects.filter(name__icontains=author_name)
+
+        context = {
+            'form': form,
+            'block_name': 'crud/template_create.html',
+            'authors': authors
+        }
+
+        return render(request, 'crud/base.html', context)
     else:
-        form = BookForm()
-
-        # Фільтрація авторів за введеним ім'ям
-    author_name = request.GET.get('author_name', '')
-    authors = Author.objects.filter(name__icontains=author_name)
-
-    context = {
-        'form': form,
-        'block_name': 'crud/template_create.html',
-        'authors': authors
-    }
-
-    return render(request, 'crud/base.html', context)
+        return redirect('home')
 
 @login_required
 def delete(request, book_id):
-    book = get_object_or_404(Books, pk=book_id)
-    if request.method == 'POST':
-        book.delete()
-        return redirect('read_books')
+    if request.user.is_admin() or request.user.is_manager():
+        book = get_object_or_404(Books, pk=book_id)
+        if request.method == 'POST':
+            book.delete()
+            return redirect('read_books')
 
-    context = {
-        'book': book,
-        'block_name': 'crud/template_delete.html',
-        'book_id': book_id,  # Додайте це поле у контекст
-    }
-    return render(request, 'crud/base.html', context)
+        context = {
+            'book': book,
+            'block_name': 'crud/template_delete.html',
+            'book_id': book_id,  # Додайте це поле у контекст
+        }
+        return render(request, 'crud/base.html', context)
+    else:
+        return redirect('home')
 
 
 @login_required
 def update(request, book_id):
-    book = get_object_or_404(Books, pk=book_id)
+    if request.user.is_admin() or request.user.is_manager():
+        book = get_object_or_404(Books, pk=book_id)
 
-    if request.method == 'POST':
-        form = BookForm(request.POST, instance=book)
-        if form.is_valid():
-            form.save()
-            return redirect('read_books')
+        if request.method == 'POST':
+            form = BookForm(request.POST, instance=book)
+            if form.is_valid():
+                form.save()
+                return redirect('read_books')
+            else:
+                print('Form is not valid')
         else:
-            print('Form is not valid')
+            form = BookForm(instance=book)
+
+        authors = Author.objects.all()  # Отримуємо всіх авторів
+
+        context = {
+            'book': book,
+            'form': form,
+            'authors': authors,  # Передаємо авторів у контекст
+            'block_name': 'crud/template_update.html',
+        }
+        return render(request, 'crud/base.html', context)
     else:
-        form = BookForm(instance=book)
-
-    authors = Author.objects.all()  # Отримуємо всіх авторів
-
-    context = {
-        'book': book,
-        'form': form,
-        'authors': authors,  # Передаємо авторів у контекст
-        'block_name': 'crud/template_update.html',
-    }
-    return render(request, 'crud/base.html', context)
+        return redirect('home')
 
 
 #---------------------------CBV-----------------------------
@@ -111,45 +118,58 @@ class AuthorListView(View):
 @class_view_decorator(login_required)
 class AuthorCreateView(View):
     def get(self, request):
-        form = AuthorForm()
-        author_name = request.GET.get('author_name', '')
-        authors = Author.objects.filter(name__icontains=author_name)
-        return render(request, 'crud/base.html', {'form': form, 'authors': authors, "block_name":'crud/template_author_create.html'})
-
-    def post(self, request):
-        form = AuthorForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('read_authors')
+        if request.user.is_admin() or request.user.is_manager():
+            form = AuthorForm()
+            author_name = request.GET.get('author_name', '')
+            authors = Author.objects.filter(name__icontains=author_name)
+            return render(request, 'crud/base.html', {'form': form, 'authors': authors, "block_name":'crud/template_author_create.html'})
         else:
-            return render(request, 'crud/base.html', {'form': form, "block_name":'crud/template_author_create.html'})
-
+            return redirect('home')
+    def post(self, request):
+        if request.user.is_admin() or request.user.is_manager():
+            form = AuthorForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('read_authors')
+            else:
+                return render(request, 'crud/base.html', {'form': form, "block_name":'crud/template_author_create.html'})
+        else:
+            return redirect('home')
 @class_view_decorator(login_required)
 class AuthorDeleteView(View):
     def get(self, request, author_id):
-        author = get_object_or_404(Author, pk=author_id)
-        return render(request, 'crud/base.html', {'author': author, "block_name":'crud/template_author_delete.html'})
-
+        if request.user.is_admin() or request.user.is_manager():
+            author = get_object_or_404(Author, pk=author_id)
+            return render(request, 'crud/base.html', {'author': author, "block_name":'crud/template_author_delete.html'})
+        else:
+            return redirect('home')
     def post(self, request, author_id):
-        author = get_object_or_404(Author, pk=author_id)
-        author.delete()
-        return redirect('read_authors')
-
+        if request.user.is_admin() or request.user.is_manager():
+            author = get_object_or_404(Author, pk=author_id)
+            author.delete()
+            return redirect('read_authors')
+        else:
+            return redirect('home')
 @class_view_decorator(login_required)
 class AuthorUpdateView(View):
     def get(self, request, author_id):
-        author = get_object_or_404(Author, pk=author_id)
-        form = AuthorForm(instance=author)
-        return render(request, 'crud/base.html', {'form': form, 'author': author, "block_name":'crud/template_author_update.html'})
+        if request.user.is_admin() or request.user.is_manager():
+            author = get_object_or_404(Author, pk=author_id)
+            form = AuthorForm(instance=author)
+            return render(request, 'crud/base.html', {'form': form, 'author': author, "block_name":'crud/template_author_update.html'})
+        else:
+            return redirect('home')
 
     def post(self, request, author_id):
-        author = get_object_or_404(Author, pk=author_id)
-        form = AuthorForm(request.POST, instance=author)
-        if form.is_valid():
-            form.save()
-            return redirect('read_authors')
+        if request.user.is_admin() or request.user.is_manager():
+            author = get_object_or_404(Author, pk=author_id)
+            form = AuthorForm(request.POST, instance=author)
+            if form.is_valid():
+                form.save()
+                return redirect('read_authors')
+            else:
+                print(form.errors)
+                return render(request, 'crud/base.html', {'form': form, 'author': author, "block_name":'crud/template_author_update.html'})
         else:
-            print(form.errors)
-            return render(request, 'crud/base.html', {'form': form, 'author': author, "block_name":'crud/template_author_update.html'})
-
+            return redirect('home')
 
