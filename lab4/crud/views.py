@@ -170,6 +170,7 @@ class AuthorUpdateView(View):
             else:
                 print(form.errors)
                 return render(request, 'crud/base.html', {'form': form, 'author': author, "block_name":'crud/template_author_update.html'})
+
         else:
             return redirect('home')
 
